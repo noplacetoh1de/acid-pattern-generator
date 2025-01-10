@@ -1,23 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
 import SequencerGrid from "./SequencerGrid";
 import SynthControls from "./SynthControls";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-interface Step {
-  active: boolean;
-  note: string;
-}
+import TransportControls from "./acid-sequencer/TransportControls";
+import NoteSelector from "./acid-sequencer/NoteSelector";
+import { useSynth } from "./acid-sequencer/useSynth";
+import { Step } from "./acid-sequencer/types";
 
 const NOTES = ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4"];
 
@@ -27,17 +17,11 @@ const AcidSequencer = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
   const [currentNote, setCurrentNote] = useState("C3");
-
-  // Initialize synth and sequence
-  const synth = new Tone.MonoSynth({
-    oscillator: { type: "sawtooth" },
-    filter: { type: "lowpass" },
-    envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.1 },
-  }).toDestination();
-
   const [sequence, setSequence] = useState<Step[]>(
     Array(16).fill({ active: false, note: "C3" })
   );
+
+  const { updateSynthParams } = useSynth(sequence, tempo);
 
   const exportMidi = () => {
     const midi = new Midi();
@@ -47,18 +31,18 @@ const AcidSequencer = () => {
       if (step.active) {
         track.addNote({
           midi: Tone.Frequency(step.note).toMidi(),
-          time: (index * 0.25), // Each step is a 16th note (0.25 beats)
+          time: index * 0.25,
           duration: 0.25,
           velocity: 0.8,
         });
       }
     });
 
-    const midiBlob = new Blob([midi.toArray()], { type: 'audio/midi' });
+    const midiBlob = new Blob([midi.toArray()], { type: "audio/midi" });
     const url = URL.createObjectURL(midiBlob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'acid-pattern.mid';
+    link.download = "acid-pattern.mid";
     link.click();
     URL.revokeObjectURL(url);
 
@@ -94,21 +78,6 @@ const AcidSequencer = () => {
     });
   };
 
-  const updateSynthParams = useCallback(
-    (cutoff: number, resonance: number, decay: number) => {
-      synth.set({
-        filterEnvelope: {
-          baseFrequency: cutoff,
-          decay,
-        },
-        filter: {
-          Q: resonance,
-        },
-      });
-    },
-    [synth]
-  );
-
   const togglePlay = () => {
     if (!isPlaying) {
       Tone.start();
@@ -120,89 +89,27 @@ const AcidSequencer = () => {
     setIsPlaying(!isPlaying);
   };
 
-  useEffect(() => {
-    const loop = new Tone.Sequence(
-      (time, step) => {
-        setCurrentStep(step);
-        if (sequence[step].active) {
-          synth.triggerAttackRelease(sequence[step].note, "16n", time);
-        }
-      },
-      [...Array(16).keys()],
-      "16n"
-    );
-
-    Tone.Transport.bpm.value = tempo;
-    loop.start(0);
-
-    return () => {
-      loop.dispose();
-    };
-  }, [sequence, tempo, synth]);
+  const handleTempoChange = (newTempo: number) => {
+    setTempo(newTempo);
+    Tone.Transport.bpm.value = newTempo;
+  };
 
   return (
     <div className="bg-black/50 p-6 rounded-lg shadow-lg border border-acid-green/30">
-      <div className="flex gap-4 mb-6">
-        <Button
-          onClick={togglePlay}
-          className={`w-24 ${
-            isPlaying
-              ? "bg-acid-pink hover:bg-acid-pink/80"
-              : "bg-acid-green hover:bg-acid-green/80"
-          } text-black font-mono`}
-        >
-          {isPlaying ? "Stop" : "Play"}
-        </Button>
-        <Button
-          onClick={randomizePattern}
-          className="bg-acid-green/20 hover:bg-acid-green/30 text-acid-green font-mono"
-        >
-          Randomize
-        </Button>
-        <Button
-          onClick={exportMidi}
-          className="bg-acid-green/20 hover:bg-acid-green/30 text-acid-green font-mono"
-        >
-          Export MIDI
-        </Button>
-      </div>
+      <TransportControls
+        isPlaying={isPlaying}
+        tempo={tempo}
+        onPlayStop={togglePlay}
+        onRandomize={randomizePattern}
+        onExportMidi={exportMidi}
+        onTempoChange={handleTempoChange}
+      />
 
-      <div className="mb-6">
-        <label className="block text-acid-green font-mono mb-2">
-          Tempo: {tempo} BPM
-        </label>
-        <Slider
-          value={[tempo]}
-          onValueChange={(value) => {
-            setTempo(value[0]);
-            Tone.Transport.bpm.value = value[0];
-          }}
-          max={200}
-          min={60}
-          step={1}
-          className="w-full"
-        />
-      </div>
-
-      <div className="mb-6">
-        <label className="block text-acid-green font-mono mb-2">Note</label>
-        <Select value={currentNote} onValueChange={setCurrentNote}>
-          <SelectTrigger className="w-32 bg-black/50 border-acid-green/30 text-acid-green">
-            <SelectValue placeholder="Select note" />
-          </SelectTrigger>
-          <SelectContent className="bg-black border-acid-green/30">
-            {NOTES.map((note) => (
-              <SelectItem
-                key={note}
-                value={note}
-                className="text-acid-green hover:bg-acid-green/20"
-              >
-                {note}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <NoteSelector
+        currentNote={currentNote}
+        onNoteChange={setCurrentNote}
+        notes={NOTES}
+      />
 
       <SequencerGrid
         sequence={sequence.map((s) => s.active)}
