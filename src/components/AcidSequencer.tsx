@@ -10,6 +10,8 @@ import ScaleSelector from "./acid-sequencer/ScaleSelector";
 import { useSynth } from "./acid-sequencer/useSynth";
 import { Step } from "./acid-sequencer/types";
 import { SCALES } from "./acid-sequencer/scales";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 const AcidSequencer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -18,11 +20,12 @@ const AcidSequencer = () => {
   const { toast } = useToast();
   const [currentScale, setCurrentScale] = useState("Major");
   const [currentNote, setCurrentNote] = useState(SCALES[currentScale].notes[0]);
+  const [kickEnabled, setKickEnabled] = useState(false);
   const [sequence, setSequence] = useState<Step[]>(
     Array(16).fill({ active: false, note: SCALES[currentScale].notes[0] })
   );
 
-  const { updateSynthParams } = useSynth(sequence, tempo, (step) => {
+  const { updateSynthParams } = useSynth(sequence, tempo, kickEnabled, (step) => {
     setCurrentStep(step);
   });
 
@@ -110,6 +113,20 @@ const AcidSequencer = () => {
         onExportMidi={exportMidi}
         onTempoChange={handleTempoChange}
       />
+
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <Switch
+            id="kick-toggle"
+            checked={kickEnabled}
+            onCheckedChange={setKickEnabled}
+            className="data-[state=checked]:bg-acid-pink"
+          />
+          <Label htmlFor="kick-toggle" className="text-acid-green font-mono">
+            909 Kick
+          </Label>
+        </div>
+      </div>
 
       <div className="flex gap-4">
         <ScaleSelector

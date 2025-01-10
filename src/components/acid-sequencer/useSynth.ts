@@ -5,9 +5,11 @@ import { Step } from "./types";
 export const useSynth = (
   sequence: Step[],
   tempo: number,
+  kickEnabled: boolean,
   onStepChange: (step: number) => void
 ) => {
   const synthRef = useRef<Tone.MonoSynth | null>(null);
+  const kickSynthRef = useRef<Tone.MembraneSynth | null>(null);
   const delayRef = useRef<Tone.FeedbackDelay | null>(null);
   const reverbRef = useRef<Tone.Reverb | null>(null);
   const loopRef = useRef<Tone.Sequence | null>(null);
@@ -47,9 +49,24 @@ export const useSynth = (
       },
     }).connect(reverbRef.current);
 
+    kickSynthRef.current = new Tone.MembraneSynth({
+      pitchDecay: 0.05,
+      octaves: 4,
+      oscillator: { type: "sine" },
+      envelope: {
+        attack: 0.001,
+        decay: 0.4,
+        sustain: 0.01,
+        release: 1.4,
+      },
+    }).toDestination();
+
     return () => {
       if (synthRef.current) {
         synthRef.current.dispose();
+      }
+      if (kickSynthRef.current) {
+        kickSynthRef.current.dispose();
       }
       if (delayRef.current) {
         delayRef.current.dispose();
@@ -116,7 +133,7 @@ export const useSynth = (
   );
 
   useEffect(() => {
-    if (!synthRef.current) return;
+    if (!synthRef.current || !kickSynthRef.current) return;
 
     if (loopRef.current) {
       loopRef.current.dispose();
@@ -126,6 +143,9 @@ export const useSynth = (
       (time, step) => {
         if (sequence[step].active) {
           synthRef.current?.triggerAttackRelease(sequence[step].note, "16n", time);
+        }
+        if (kickEnabled && step % 4 === 0) {
+          kickSynthRef.current?.triggerAttackRelease("C1", "16n", time);
         }
         onStepChange(step);
       },
@@ -141,7 +161,7 @@ export const useSynth = (
         loopRef.current.dispose();
       }
     };
-  }, [sequence, tempo, onStepChange]);
+  }, [sequence, tempo, kickEnabled, onStepChange]);
 
   return { updateSynthParams };
 };
