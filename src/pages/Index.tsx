@@ -1,4 +1,5 @@
 import AcidSequencer from "@/components/AcidSequencer";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -9,6 +10,7 @@ const Index = () => {
         </h1>
         <AcidSequencer />
       </div>
+      <Footer />
     </div>
   );
 };
