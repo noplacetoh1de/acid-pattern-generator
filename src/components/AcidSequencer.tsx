@@ -72,10 +72,6 @@ const AcidSequencer = () => {
           note: NOTES[Math.floor(Math.random() * NOTES.length)],
         }))
     );
-    toast({
-      title: "Pattern Randomized!",
-      description: "New acid pattern generated with random notes.",
-    });
   };
 
   const togglePlay = () => {
