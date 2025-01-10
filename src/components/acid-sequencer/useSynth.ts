@@ -7,19 +7,33 @@ export const useSynth = (
   tempo: number,
   onStepChange: (step: number) => void
 ) => {
-  // Use refs to persist audio nodes between renders
   const synthRef = useRef<Tone.MonoSynth | null>(null);
   const loopRef = useRef<Tone.Sequence | null>(null);
 
-  // Initialize synth only once
   useEffect(() => {
     synthRef.current = new Tone.MonoSynth({
       oscillator: { type: "sawtooth" },
-      filter: { type: "lowpass" },
-      envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.1 },
+      filter: { 
+        type: "lowpass",
+        rolloff: -24 
+      },
+      envelope: {
+        attack: 0.001,
+        decay: 0.1,
+        sustain: 0.3,
+        release: 0.1
+      },
+      filterEnvelope: {
+        attack: 0.001,
+        decay: 0.1,
+        sustain: 0.3,
+        release: 0.1,
+        baseFrequency: 2000,
+        octaves: 4,
+        exponent: 2
+      }
     }).toDestination();
 
-    // Cleanup function
     return () => {
       if (synthRef.current) {
         synthRef.current.dispose();
@@ -27,7 +41,6 @@ export const useSynth = (
       if (loopRef.current) {
         loopRef.current.dispose();
       }
-      // Stop transport when component unmounts
       Tone.Transport.stop();
       Tone.Transport.cancel();
     };
@@ -38,11 +51,18 @@ export const useSynth = (
       if (synthRef.current) {
         synthRef.current.set({
           envelope: {
+            attack: 0.001,
             decay: decay,
+            sustain: 0.3,
+            release: 0.1
           },
           filterEnvelope: {
-            baseFrequency: cutoff,
+            attack: 0.001,
             decay: decay,
+            sustain: 0.3,
+            release: 0.1,
+            baseFrequency: cutoff,
+            octaves: 4
           },
           filter: {
             Q: resonance,
@@ -53,16 +73,13 @@ export const useSynth = (
     []
   );
 
-  // Update sequence when sequence or tempo changes
   useEffect(() => {
     if (!synthRef.current) return;
 
-    // Dispose of previous loop if it exists
     if (loopRef.current) {
       loopRef.current.dispose();
     }
 
-    // Create new loop
     loopRef.current = new Tone.Sequence(
       (time, step) => {
         if (sequence[step].active) {
