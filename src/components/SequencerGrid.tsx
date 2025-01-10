@@ -2,12 +2,14 @@ interface SequencerGridProps {
   sequence: boolean[];
   currentStep: number;
   onToggleStep: (step: number) => void;
+  notes: string[];
 }
 
 const SequencerGrid = ({
   sequence,
   currentStep,
   onToggleStep,
+  notes,
 }: SequencerGridProps) => {
   return (
     <div className="grid grid-cols-8 gap-2 mb-6">
@@ -16,7 +18,7 @@ const SequencerGrid = ({
           key={index}
           onClick={() => onToggleStep(index)}
           className={`
-            w-full aspect-square rounded-md border-2 transition-all duration-150
+            w-full aspect-square rounded-md border-2 transition-all duration-150 relative
             ${
               isActive
                 ? "bg-acid-green border-acid-green"
@@ -24,7 +26,13 @@ const SequencerGrid = ({
             }
             ${currentStep === index ? "shadow-lg shadow-acid-green/50" : ""}
           `}
-        />
+        >
+          {isActive && (
+            <span className="absolute inset-0 flex items-center justify-center text-black text-xs font-mono">
+              {notes[index]}
+            </span>
+          )}
+        </button>
       ))}
     </div>
   );

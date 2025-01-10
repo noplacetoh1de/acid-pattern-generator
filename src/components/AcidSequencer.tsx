@@ -172,6 +172,7 @@ const AcidSequencer = () => {
         sequence={sequence.map((s) => s.active)}
         currentStep={currentStep}
         onToggleStep={toggleStep}
+        notes={sequence.map((s) => s.note)}
       />
 
       <SynthControls onParamsChange={updateSynthParams} />
