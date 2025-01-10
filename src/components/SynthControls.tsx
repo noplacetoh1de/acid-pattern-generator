@@ -25,7 +25,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
           value={[cutoff]}
           onValueChange={(value) => setCutoff(value[0])}
           min={20}
-          max={20000}
+          max={6000}
           step={1}
           className="w-full"
         />
