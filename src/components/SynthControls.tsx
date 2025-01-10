@@ -24,7 +24,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
   const [delayFeedback, setDelayFeedback] = useState(0.3);
   const [reverbDecay, setReverbDecay] = useState(1.5);
   const [reverbMix, setReverbMix] = useState(0.3);
-  const [effectsEnabled, setEffectsEnabled] = useState(true);
+  const [effectsEnabled, setEffectsEnabled] = useState(false);
 
   useEffect(() => {
     onParamsChange(
