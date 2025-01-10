@@ -1,4 +1,5 @@
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 
 interface SynthControlsProps {
@@ -23,6 +24,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
   const [delayFeedback, setDelayFeedback] = useState(0.3);
   const [reverbDecay, setReverbDecay] = useState(1.5);
   const [reverbMix, setReverbMix] = useState(0.3);
+  const [effectsEnabled, setEffectsEnabled] = useState(true);
 
   useEffect(() => {
     onParamsChange(
@@ -30,10 +32,10 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
       resonance,
       decay,
       release,
-      delayTime,
-      delayFeedback,
-      reverbDecay,
-      reverbMix
+      effectsEnabled ? delayTime : 0,
+      effectsEnabled ? delayFeedback : 0,
+      effectsEnabled ? reverbDecay : 0.1,
+      effectsEnabled ? reverbMix : 0
     );
   }, [
     cutoff,
@@ -44,6 +46,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
     delayFeedback,
     reverbDecay,
     reverbMix,
+    effectsEnabled,
     onParamsChange,
   ]);
 
@@ -105,8 +108,20 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
       </div>
 
       <div className="border-t border-acid-green/30 pt-6">
-        <h3 className="text-acid-green font-mono mb-4">Effects</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-acid-green font-mono">Effects</h3>
+          <div className="flex items-center gap-2">
+            <label className="text-acid-green font-mono text-sm">
+              {effectsEnabled ? "On" : "Off"}
+            </label>
+            <Switch
+              checked={effectsEnabled}
+              onCheckedChange={setEffectsEnabled}
+              className="data-[state=checked]:bg-acid-green"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 opacity-100 transition-opacity duration-200" style={{ opacity: effectsEnabled ? 1 : 0.5 }}>
           <div>
             <label className="block text-acid-green font-mono mb-2">
               Delay Time: {delayTime.toFixed(2)}s
@@ -118,6 +133,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
               max={1}
               step={0.01}
               className="w-full"
+              disabled={!effectsEnabled}
             />
           </div>
           <div>
@@ -131,6 +147,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
               max={0.9}
               step={0.01}
               className="w-full"
+              disabled={!effectsEnabled}
             />
           </div>
           <div>
@@ -144,6 +161,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
               max={10}
               step={0.1}
               className="w-full"
+              disabled={!effectsEnabled}
             />
           </div>
           <div>
@@ -157,6 +175,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
               max={1}
               step={0.01}
               className="w-full"
+              disabled={!effectsEnabled}
             />
           </div>
         </div>
