@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import * as Tone from "tone";
+import { Midi } from "@tonejs/midi";
 import SequencerGrid from "./SequencerGrid";
 import SynthControls from "./SynthControls";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,35 @@ const AcidSequencer = () => {
   const [sequence, setSequence] = useState<Step[]>(
     Array(16).fill({ active: false, note: "C3" })
   );
+
+  const exportMidi = () => {
+    const midi = new Midi();
+    const track = midi.addTrack();
+
+    sequence.forEach((step, index) => {
+      if (step.active) {
+        track.addNote({
+          midi: Tone.Frequency(step.note).toMidi(),
+          time: (index * 0.25), // Each step is a 16th note (0.25 beats)
+          duration: 0.25,
+          velocity: 0.8,
+        });
+      }
+    });
+
+    const midiBlob = new Blob([midi.toArray()], { type: 'audio/midi' });
+    const url = URL.createObjectURL(midiBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'acid-pattern.mid';
+    link.click();
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Pattern Exported!",
+      description: "Your acid pattern has been exported as a MIDI file.",
+    });
+  };
 
   const toggleStep = (step: number) => {
     setSequence((prev) => {
@@ -128,6 +158,12 @@ const AcidSequencer = () => {
           className="bg-acid-green/20 hover:bg-acid-green/30 text-acid-green font-mono"
         >
           Randomize
+        </Button>
+        <Button
+          onClick={exportMidi}
+          className="bg-acid-green/20 hover:bg-acid-green/30 text-acid-green font-mono"
+        >
+          Export MIDI
         </Button>
       </div>
 
