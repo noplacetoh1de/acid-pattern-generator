@@ -22,7 +22,9 @@ const AcidSequencer = () => {
     Array(16).fill({ active: false, note: SCALES[currentScale].notes[0] })
   );
 
-  const { updateSynthParams } = useSynth(sequence, tempo);
+  const { updateSynthParams } = useSynth(sequence, tempo, (step) => {
+    setCurrentStep(step);
+  });
 
   const exportMidi = () => {
     const midi = new Midi();
@@ -79,7 +81,7 @@ const AcidSequencer = () => {
   const handleScaleChange = (newScale: string) => {
     setCurrentScale(newScale);
     const newNotes = SCALES[newScale].notes;
-    setCurrentNote(newNotes[0]); // Reset current note to first note in new scale
+    setCurrentNote(newNotes[0]);
   };
 
   const togglePlay = () => {

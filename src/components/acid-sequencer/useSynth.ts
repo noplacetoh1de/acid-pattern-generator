@@ -2,7 +2,11 @@ import { useCallback, useEffect } from "react";
 import * as Tone from "tone";
 import { Step } from "./types";
 
-export const useSynth = (sequence: Step[], tempo: number) => {
+export const useSynth = (
+  sequence: Step[],
+  tempo: number,
+  onStepChange: (step: number) => void
+) => {
   const synth = new Tone.MonoSynth({
     oscillator: { type: "sawtooth" },
     filter: { type: "lowpass" },
@@ -30,6 +34,7 @@ export const useSynth = (sequence: Step[], tempo: number) => {
         if (sequence[step].active) {
           synth.triggerAttackRelease(sequence[step].note, "16n", time);
         }
+        onStepChange(step);
       },
       [...Array(16).keys()],
       "16n"
@@ -41,7 +46,7 @@ export const useSynth = (sequence: Step[], tempo: number) => {
     return () => {
       loop.dispose();
     };
-  }, [sequence, tempo, synth]);
+  }, [sequence, tempo, synth, onStepChange]);
 
   return { synth, updateSynthParams };
 };
