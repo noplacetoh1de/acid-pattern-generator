@@ -20,10 +20,11 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
   const [resonance, setResonance] = useState(1);
   const [decay, setDecay] = useState(0.1);
   const [release, setRelease] = useState(0.1);
-  const [delayTime, setDelayTime] = useState(0.3);
-  const [delayFeedback, setDelayFeedback] = useState(0.3);
-  const [reverbDecay, setReverbDecay] = useState(1.5);
-  const [reverbMix, setReverbMix] = useState(0.3);
+  // Initialize effect states to 0 since effects are disabled by default
+  const [delayTime, setDelayTime] = useState(0);
+  const [delayFeedback, setDelayFeedback] = useState(0);
+  const [reverbDecay, setReverbDecay] = useState(0.1);
+  const [reverbMix, setReverbMix] = useState(0);
   const [effectsEnabled, setEffectsEnabled] = useState(false);
 
   // Trigger the initial state immediately to ensure effects are off at start
@@ -33,10 +34,10 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
       resonance,
       decay,
       release,
-      0, // Initial delay time is 0 when effects are disabled
-      0, // Initial delay feedback is 0 when effects are disabled
-      0.1, // Initial reverb decay is minimal when effects are disabled
-      0 // Initial reverb mix is 0 when effects are disabled
+      0,
+      0,
+      0.1,
+      0
     );
   }, []); // Only run once on mount
 
@@ -64,6 +65,8 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
     effectsEnabled,
     onParamsChange,
   ]);
+
+  // ... keep existing code (UI rendering with Sliders and Switch components)
 
   return (
     <div className="space-y-6">
