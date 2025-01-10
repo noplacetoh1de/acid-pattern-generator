@@ -1,18 +1,14 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
-import SequencerGrid from "./SequencerGrid";
 import SynthControls from "./SynthControls";
 import { useToast } from "@/components/ui/use-toast";
 import TransportControls from "./acid-sequencer/TransportControls";
-import NoteSelector from "./acid-sequencer/NoteSelector";
-import ScaleSelector from "./acid-sequencer/ScaleSelector";
 import { useSynth } from "./acid-sequencer/useSynth";
 import { Step } from "./acid-sequencer/types";
 import { SCALES } from "./acid-sequencer/scales";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
-import { Slider } from "./ui/slider";
+import PatternControls from "./acid-sequencer/PatternControls";
+import KickControls from "./acid-sequencer/KickControls";
 
 const AcidSequencer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -116,53 +112,21 @@ const AcidSequencer = () => {
         onTempoChange={handleTempoChange}
       />
 
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <Switch
-            id="kick-toggle"
-            checked={kickEnabled}
-            onCheckedChange={setKickEnabled}
-            className="data-[state=checked]:bg-acid-pink"
-          />
-          <Label htmlFor="kick-toggle" className="text-acid-green font-mono">
-            909 Kick
-          </Label>
-        </div>
-        {kickEnabled && (
-          <div className="flex items-center gap-2 ml-4">
-            <Label htmlFor="kick-gain" className="text-acid-green font-mono min-w-20">
-              Kick Gain: {kickGain.toFixed(1)}
-            </Label>
-            <Slider
-              id="kick-gain"
-              min={0}
-              max={1}
-              step={0.1}
-              value={[kickGain]}
-              onValueChange={(value) => setKickGain(value[0])}
-              className="w-32"
-            />
-          </div>
-        )}
-      </div>
+      <KickControls
+        kickEnabled={kickEnabled}
+        kickGain={kickGain}
+        onKickToggle={setKickEnabled}
+        onKickGainChange={setKickGain}
+      />
 
-      <div className="flex gap-4">
-        <ScaleSelector
-          currentScale={currentScale}
-          onScaleChange={handleScaleChange}
-        />
-        <NoteSelector
-          currentNote={currentNote}
-          onNoteChange={setCurrentNote}
-          notes={SCALES[currentScale].notes}
-        />
-      </div>
-
-      <SequencerGrid
-        sequence={sequence.map((s) => s.active)}
+      <PatternControls
+        sequence={sequence}
         currentStep={currentStep}
+        currentScale={currentScale}
+        currentNote={currentNote}
+        onScaleChange={handleScaleChange}
+        onNoteChange={setCurrentNote}
         onToggleStep={toggleStep}
-        notes={sequence.map((s) => s.note)}
       />
 
       <SynthControls onParamsChange={updateSynthParams} />
