@@ -116,7 +116,7 @@ const AcidSequencer = () => {
         onTempoChange={handleTempoChange}
       />
 
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6 bg-black/30 p-4 rounded-md">
         <div className="flex items-center gap-2">
           <Switch
             id="kick-toggle"
@@ -130,7 +130,7 @@ const AcidSequencer = () => {
         </div>
         {kickEnabled && (
           <div className="flex items-center gap-2 ml-4">
-            <Label htmlFor="kick-gain" className="text-acid-green font-mono min-w-20">
+            <Label htmlFor="kick-gain" className="text-acid-green font-mono whitespace-nowrap">
               Kick Gain: {kickGain.toFixed(1)}
             </Label>
             <Slider
@@ -140,7 +140,7 @@ const AcidSequencer = () => {
               step={0.1}
               value={[kickGain]}
               onValueChange={(value) => setKickGain(value[0])}
-              className="w-32"
+              className="w-32 [&>[role=slider]]:bg-acid-pink [&>.relative>.absolute]:bg-acid-pink"
             />
           </div>
         )}
