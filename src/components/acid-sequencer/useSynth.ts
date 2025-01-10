@@ -87,6 +87,13 @@ export const useSynth = (
       Tone.Transport.stop();
       Tone.Transport.cancel();
     };
+  }, []); // Remove kickGain from dependencies
+
+  // Add separate effect to handle kick gain changes
+  useEffect(() => {
+    if (kickGainNode.current) {
+      kickGainNode.current.gain.value = kickGain;
+    }
   }, [kickGain]);
 
   const updateSynthParams = useCallback(
