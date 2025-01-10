@@ -26,6 +26,21 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
   const [reverbMix, setReverbMix] = useState(0.3);
   const [effectsEnabled, setEffectsEnabled] = useState(false);
 
+  // Trigger the initial state immediately to ensure effects are off at start
+  useEffect(() => {
+    onParamsChange(
+      cutoff,
+      resonance,
+      decay,
+      release,
+      0, // Initial delay time is 0 when effects are disabled
+      0, // Initial delay feedback is 0 when effects are disabled
+      0.1, // Initial reverb decay is minimal when effects are disabled
+      0 // Initial reverb mix is 0 when effects are disabled
+    );
+  }, []); // Only run once on mount
+
+  // Handle subsequent parameter changes
   useEffect(() => {
     onParamsChange(
       cutoff,
