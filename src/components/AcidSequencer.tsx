@@ -6,19 +6,20 @@ import SynthControls from "./SynthControls";
 import { useToast } from "@/components/ui/use-toast";
 import TransportControls from "./acid-sequencer/TransportControls";
 import NoteSelector from "./acid-sequencer/NoteSelector";
+import ScaleSelector from "./acid-sequencer/ScaleSelector";
 import { useSynth } from "./acid-sequencer/useSynth";
 import { Step } from "./acid-sequencer/types";
-
-const NOTES = ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4"];
+import { SCALES } from "./acid-sequencer/scales";
 
 const AcidSequencer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [tempo, setTempo] = useState(120);
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
-  const [currentNote, setCurrentNote] = useState("C3");
+  const [currentScale, setCurrentScale] = useState("Major");
+  const [currentNote, setCurrentNote] = useState(SCALES[currentScale].notes[0]);
   const [sequence, setSequence] = useState<Step[]>(
-    Array(16).fill({ active: false, note: "C3" })
+    Array(16).fill({ active: false, note: SCALES[currentScale].notes[0] })
   );
 
   const { updateSynthParams } = useSynth(sequence, tempo);
@@ -64,14 +65,21 @@ const AcidSequencer = () => {
   };
 
   const randomizePattern = () => {
+    const scaleNotes = SCALES[currentScale].notes;
     setSequence(
       Array(16)
         .fill(null)
         .map(() => ({
           active: Math.random() > 0.7,
-          note: NOTES[Math.floor(Math.random() * NOTES.length)],
+          note: scaleNotes[Math.floor(Math.random() * scaleNotes.length)],
         }))
     );
+  };
+
+  const handleScaleChange = (newScale: string) => {
+    setCurrentScale(newScale);
+    const newNotes = SCALES[newScale].notes;
+    setCurrentNote(newNotes[0]); // Reset current note to first note in new scale
   };
 
   const togglePlay = () => {
@@ -101,11 +109,17 @@ const AcidSequencer = () => {
         onTempoChange={handleTempoChange}
       />
 
-      <NoteSelector
-        currentNote={currentNote}
-        onNoteChange={setCurrentNote}
-        notes={NOTES}
-      />
+      <div className="flex gap-4">
+        <ScaleSelector
+          currentScale={currentScale}
+          onScaleChange={handleScaleChange}
+        />
+        <NoteSelector
+          currentNote={currentNote}
+          onNoteChange={setCurrentNote}
+          notes={SCALES[currentScale].notes}
+        />
+      </div>
 
       <SequencerGrid
         sequence={sequence.map((s) => s.active)}
