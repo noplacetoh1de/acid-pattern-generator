@@ -20,7 +20,7 @@ const ScaleSelector = ({ currentScale, onScaleChange }: ScaleSelectorProps) => {
         <SelectTrigger className="w-32 bg-black/50 border-acid-green/30 text-acid-green">
           <SelectValue placeholder="Select scale" />
         </SelectTrigger>
-        <SelectContent className="bg-black border-acid-green/30 [&>div>button]:text-acid-green">
+        <SelectContent className="bg-black border-acid-green/30 [&>div>button]:text-acid-green [&>button]:text-acid-green">
           {Object.keys(SCALES).map((scale) => (
             <SelectItem
               key={scale}
