@@ -6,10 +6,12 @@ export const useSynth = (
   sequence: Step[],
   tempo: number,
   kickEnabled: boolean,
+  kickGain: number,
   onStepChange: (step: number) => void
 ) => {
   const synthRef = useRef<Tone.MonoSynth | null>(null);
   const kickSynthRef = useRef<Tone.MembraneSynth | null>(null);
+  const kickGainNode = useRef<Tone.Gain | null>(null);
   const delayRef = useRef<Tone.FeedbackDelay | null>(null);
   const reverbRef = useRef<Tone.Reverb | null>(null);
   const loopRef = useRef<Tone.Sequence | null>(null);
@@ -49,6 +51,8 @@ export const useSynth = (
       },
     }).connect(reverbRef.current);
 
+    kickGainNode.current = new Tone.Gain(kickGain).toDestination();
+
     kickSynthRef.current = new Tone.MembraneSynth({
       pitchDecay: 0.05,
       octaves: 4,
@@ -59,7 +63,7 @@ export const useSynth = (
         sustain: 0.01,
         release: 1.4,
       },
-    }).toDestination();
+    }).connect(kickGainNode.current);
 
     return () => {
       if (synthRef.current) {
@@ -67,6 +71,9 @@ export const useSynth = (
       }
       if (kickSynthRef.current) {
         kickSynthRef.current.dispose();
+      }
+      if (kickGainNode.current) {
+        kickGainNode.current.dispose();
       }
       if (delayRef.current) {
         delayRef.current.dispose();
@@ -80,7 +87,7 @@ export const useSynth = (
       Tone.Transport.stop();
       Tone.Transport.cancel();
     };
-  }, []);
+  }, [kickGain]);
 
   const updateSynthParams = useCallback(
     (

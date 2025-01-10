@@ -12,6 +12,7 @@ import { Step } from "./acid-sequencer/types";
 import { SCALES } from "./acid-sequencer/scales";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
+import { Slider } from "./ui/slider";
 
 const AcidSequencer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -21,11 +22,12 @@ const AcidSequencer = () => {
   const [currentScale, setCurrentScale] = useState("Major");
   const [currentNote, setCurrentNote] = useState(SCALES[currentScale].notes[0]);
   const [kickEnabled, setKickEnabled] = useState(false);
+  const [kickGain, setKickGain] = useState(0.8);
   const [sequence, setSequence] = useState<Step[]>(
     Array(16).fill({ active: false, note: SCALES[currentScale].notes[0] })
   );
 
-  const { updateSynthParams } = useSynth(sequence, tempo, kickEnabled, (step) => {
+  const { updateSynthParams } = useSynth(sequence, tempo, kickEnabled, kickGain, (step) => {
     setCurrentStep(step);
   });
 
@@ -126,6 +128,22 @@ const AcidSequencer = () => {
             909 Kick
           </Label>
         </div>
+        {kickEnabled && (
+          <div className="flex items-center gap-2 ml-4">
+            <Label htmlFor="kick-gain" className="text-acid-green font-mono min-w-20">
+              Kick Gain: {kickGain.toFixed(1)}
+            </Label>
+            <Slider
+              id="kick-gain"
+              min={0}
+              max={1}
+              step={0.1}
+              value={[kickGain]}
+              onValueChange={(value) => setKickGain(value[0])}
+              className="w-32"
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex gap-4">
