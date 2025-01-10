@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import * as Tone from "tone";
 import { Step } from "./types";
 
@@ -7,32 +7,63 @@ export const useSynth = (
   tempo: number,
   onStepChange: (step: number) => void
 ) => {
-  const synth = new Tone.MonoSynth({
-    oscillator: { type: "sawtooth" },
-    filter: { type: "lowpass" },
-    envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.1 },
-  }).toDestination();
+  // Use refs to persist audio nodes between renders
+  const synthRef = useRef<Tone.MonoSynth | null>(null);
+  const loopRef = useRef<Tone.Sequence | null>(null);
+
+  // Initialize synth only once
+  useEffect(() => {
+    synthRef.current = new Tone.MonoSynth({
+      oscillator: { type: "sawtooth" },
+      filter: { type: "lowpass" },
+      envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.1 },
+    }).toDestination();
+
+    // Cleanup function
+    return () => {
+      if (synthRef.current) {
+        synthRef.current.dispose();
+      }
+      if (loopRef.current) {
+        loopRef.current.dispose();
+      }
+      // Stop transport when component unmounts
+      Tone.Transport.stop();
+      Tone.Transport.cancel();
+    };
+  }, []);
 
   const updateSynthParams = useCallback(
     (cutoff: number, resonance: number, decay: number) => {
-      synth.set({
-        filterEnvelope: {
-          baseFrequency: cutoff,
-          decay,
-        },
-        filter: {
-          Q: resonance,
-        },
-      });
+      if (synthRef.current) {
+        synthRef.current.set({
+          filterEnvelope: {
+            baseFrequency: cutoff,
+            decay,
+          },
+          filter: {
+            Q: resonance,
+          },
+        });
+      }
     },
-    [synth]
+    []
   );
 
+  // Update sequence when sequence or tempo changes
   useEffect(() => {
-    const loop = new Tone.Sequence(
+    if (!synthRef.current) return;
+
+    // Dispose of previous loop if it exists
+    if (loopRef.current) {
+      loopRef.current.dispose();
+    }
+
+    // Create new loop
+    loopRef.current = new Tone.Sequence(
       (time, step) => {
         if (sequence[step].active) {
-          synth.triggerAttackRelease(sequence[step].note, "16n", time);
+          synthRef.current?.triggerAttackRelease(sequence[step].note, "16n", time);
         }
         onStepChange(step);
       },
@@ -41,12 +72,14 @@ export const useSynth = (
     );
 
     Tone.Transport.bpm.value = tempo;
-    loop.start(0);
+    loopRef.current.start(0);
 
     return () => {
-      loop.dispose();
+      if (loopRef.current) {
+        loopRef.current.dispose();
+      }
     };
-  }, [sequence, tempo, synth, onStepChange]);
+  }, [sequence, tempo, onStepChange]);
 
-  return { synth, updateSynthParams };
+  return { updateSynthParams };
 };
