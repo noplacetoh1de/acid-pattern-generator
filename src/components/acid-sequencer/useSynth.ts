@@ -47,20 +47,20 @@ export const useSynth = (
   }, []);
 
   const updateSynthParams = useCallback(
-    (cutoff: number, resonance: number, decay: number) => {
+    (cutoff: number, resonance: number, decay: number, release: number) => {
       if (synthRef.current) {
         synthRef.current.set({
           envelope: {
             attack: 0.001,
             decay: decay,
             sustain: 0.3,
-            release: 0.1
+            release: release
           },
           filterEnvelope: {
             attack: 0.001,
             decay: decay,
             sustain: 0.3,
-            release: 0.1,
+            release: release,
             baseFrequency: cutoff,
             octaves: 4
           },

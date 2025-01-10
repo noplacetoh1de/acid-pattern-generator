@@ -2,20 +2,21 @@ import { Slider } from "@/components/ui/slider";
 import { useEffect, useState } from "react";
 
 interface SynthControlsProps {
-  onParamsChange: (cutoff: number, resonance: number, decay: number) => void;
+  onParamsChange: (cutoff: number, resonance: number, decay: number, release: number) => void;
 }
 
 const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
   const [cutoff, setCutoff] = useState(2000);
   const [resonance, setResonance] = useState(1);
   const [decay, setDecay] = useState(0.1);
+  const [release, setRelease] = useState(0.1);
 
   useEffect(() => {
-    onParamsChange(cutoff, resonance, decay);
-  }, [cutoff, resonance, decay, onParamsChange]);
+    onParamsChange(cutoff, resonance, decay, release);
+  }, [cutoff, resonance, decay, release, onParamsChange]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div>
         <label className="block text-acid-green font-mono mb-2">
           Cutoff: {Math.round(cutoff)} Hz
@@ -51,6 +52,19 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
           onValueChange={(value) => setDecay(value[0])}
           min={0.01}
           max={1}
+          step={0.01}
+          className="w-full"
+        />
+      </div>
+      <div>
+        <label className="block text-acid-green font-mono mb-2">
+          Release: {release.toFixed(2)}s
+        </label>
+        <Slider
+          value={[release]}
+          onValueChange={(value) => setRelease(value[0])}
+          min={0.01}
+          max={2}
           step={0.01}
           className="w-full"
         />
