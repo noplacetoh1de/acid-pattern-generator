@@ -37,9 +37,12 @@ export const useSynth = (
     (cutoff: number, resonance: number, decay: number) => {
       if (synthRef.current) {
         synthRef.current.set({
+          envelope: {
+            decay: decay,
+          },
           filterEnvelope: {
             baseFrequency: cutoff,
-            decay,
+            decay: decay,
           },
           filter: {
             Q: resonance,
