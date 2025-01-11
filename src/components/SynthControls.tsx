@@ -10,6 +10,7 @@ interface SynthControlsProps {
     release: number,
     delayTime: number,
     delayFeedback: number,
+    delayWet: number,
     reverbDecay: number,
     reverbMix: number
   ) => void;
@@ -22,6 +23,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
   const [release, setRelease] = useState(0.1);
   const [delayTime, setDelayTime] = useState(0.3);
   const [delayFeedback, setDelayFeedback] = useState(0.3);
+  const [delayWet, setDelayWet] = useState(0.5);
   const [reverbDecay, setReverbDecay] = useState(1.5);
   const [reverbMix, setReverbMix] = useState(0.3);
   const [effectsEnabled, setEffectsEnabled] = useState(false);
@@ -34,6 +36,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
       release,
       effectsEnabled ? delayTime : 0,
       effectsEnabled ? delayFeedback : 0,
+      effectsEnabled ? delayWet : 0,
       effectsEnabled ? reverbDecay : 0.1,
       effectsEnabled ? reverbMix : 0
     );
@@ -44,6 +47,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
     release,
     delayTime,
     delayFeedback,
+    delayWet,
     reverbDecay,
     reverbMix,
     effectsEnabled,
@@ -121,7 +125,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 opacity-100 transition-opacity duration-200" style={{ opacity: effectsEnabled ? 1 : 0.5 }}>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 opacity-100 transition-opacity duration-200" style={{ opacity: effectsEnabled ? 1 : 0.5 }}>
           <div>
             <label className="block text-acid-green font-mono mb-2">
               Delay Time: {delayTime.toFixed(2)}s
@@ -145,6 +149,20 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
               onValueChange={(value) => setDelayFeedback(value[0])}
               min={0}
               max={0.9}
+              step={0.01}
+              className="w-full"
+              disabled={!effectsEnabled}
+            />
+          </div>
+          <div>
+            <label className="block text-acid-green font-mono mb-2">
+              Delay Wet:<br />{delayWet.toFixed(2)}
+            </label>
+            <Slider
+              value={[delayWet]}
+              onValueChange={(value) => setDelayWet(value[0])}
+              min={0}
+              max={1}
               step={0.01}
               className="w-full"
               disabled={!effectsEnabled}

@@ -20,12 +20,12 @@ export const useSynth = (
     delayRef.current = new Tone.FeedbackDelay({
       delayTime: 0.3,
       feedback: 0.3,
-      wet: 0.3,
+      wet: 0,
     }).toDestination();
 
     reverbRef.current = new Tone.Reverb({
       decay: 1.5,
-      wet: 0.3,
+      wet: 0,
     }).connect(delayRef.current);
 
     synthRef.current = new Tone.MonoSynth({
@@ -104,6 +104,7 @@ export const useSynth = (
       release: number,
       delayTime: number,
       delayFeedback: number,
+      delayWet: number,
       reverbDecay: number,
       reverbMix: number
     ) => {
@@ -133,7 +134,7 @@ export const useSynth = (
         delayRef.current.set({
           delayTime: delayTime,
           feedback: delayFeedback,
-          wet: delayFeedback,
+          wet: delayWet,
         });
       }
 
