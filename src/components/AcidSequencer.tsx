@@ -18,7 +18,7 @@ const AcidSequencer = () => {
   const [currentScale, setCurrentScale] = useState("Major");
   const [currentNote, setCurrentNote] = useState(SCALES[currentScale].notes[0]);
   const [kickEnabled, setKickEnabled] = useState(false);
-  const [kickGain, setKickGain] = useState(0.8);
+  const [kickGain, setKickGain] = useState(2);
   const [sequence, setSequence] = useState<Step[]>(
     Array(16).fill({ active: false, note: SCALES[currentScale].notes[0] })
   );
@@ -52,7 +52,7 @@ const AcidSequencer = () => {
 
     toast({
       title: "Pattern Exported!",
-      description: "Your acid pattern has been exported as a MIDI file.",
+      description: "(-: Your acid pattern has been exported as a MIDI file :-)",
     });
   };
 

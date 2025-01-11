@@ -55,12 +55,12 @@ export const useSynth = (
 
     kickSynthRef.current = new Tone.MembraneSynth({
       pitchDecay: 0.05,
-      octaves: 4,
+      octaves: 5,
       oscillator: { type: "sine" },
       envelope: {
-        attack: 0.001,
+        attack: 0.01,
         decay: 0.4,
-        sustain: 0.01,
+        sustain: 0.2,
         release: 1.4,
       },
     }).connect(kickGainNode.current);
@@ -133,6 +133,7 @@ export const useSynth = (
         delayRef.current.set({
           delayTime: delayTime,
           feedback: delayFeedback,
+          wet: delayFeedback,
         });
       }
 

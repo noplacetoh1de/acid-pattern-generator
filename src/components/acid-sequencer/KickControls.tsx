@@ -25,7 +25,7 @@ const KickControls = ({
           className="data-[state=checked]:bg-acid-pink"
         />
         <Label htmlFor="kick-toggle" className="text-acid-green font-mono">
-          909 Kick
+          Kick pattern
         </Label>
       </div>
       {kickEnabled && (
@@ -36,7 +36,7 @@ const KickControls = ({
           <Slider
             id="kick-gain"
             min={0}
-            max={1}
+            max={4}
             step={0.1}
             value={[kickGain]}
             onValueChange={(value) => onKickGainChange(value[0])}

@@ -27,7 +27,7 @@ const SynthControls = ({ onParamsChange }: SynthControlsProps) => {
   const [effectsEnabled, setEffectsEnabled] = useState(false);
 
   useEffect(() => {
-    onParamsChange(
+    onParamsChange( 
       cutoff,
       resonance,
       decay,
