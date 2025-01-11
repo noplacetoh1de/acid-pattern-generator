@@ -34,6 +34,7 @@ const Index = () => {
                   The Acid Pattern Generator is a web-based synthesizer and sequencer 
                   inspired by the iconic Roland TB-303. Create mesmerizing acid basslines 
                   by adjusting notes, patterns, and effects in real-time.
+                  To get started quickly and easily, simply choose a desired scale (Phrygian works well) and click the 'Randomize' button.
                 </p>
               </div>
             </PopoverContent>
