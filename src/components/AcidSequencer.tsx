@@ -15,7 +15,7 @@ const AcidSequencer = () => {
   const [tempo, setTempo] = useState(120);
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
-  const [currentScale, setCurrentScale] = useState("Major");
+  const [currentScale, setCurrentScale] = useState("Phrygian");
   const [currentNote, setCurrentNote] = useState(SCALES[currentScale].notes[0]);
   const [kickEnabled, setKickEnabled] = useState(false);
   const [kickGain, setKickGain] = useState(2);
