@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react"
 import AcidSequencer from "@/components/AcidSequencer";
 import Footer from "@/components/Footer";
 import { Info } from "lucide-react";
@@ -43,6 +44,7 @@ const Index = () => {
         <AcidSequencer />
       </div>
       <Footer />
+      <Analytics />
     </div>
   );
 };
